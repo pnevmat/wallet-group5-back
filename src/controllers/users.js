@@ -16,7 +16,6 @@ const register = async (req, res, next) => {
         message: "Email or name in use",
       });
     }
-
     const { id, name, email, avatarURL, balance } = await Users.create(
       req.body
     );

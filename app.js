@@ -7,7 +7,8 @@ const boolParser = require("express-query-boolean");
 const { limiterAPI } = require("./src/helpers/constants");
 const path = require("path");
 require("dotenv").config();
-const PUBLIC_DIR = process.env.PUBLIC_DIR;
+const PUBLIC_DIR = process.env.PUBLIC;
+
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use(express.json({ limit: 10000 }));
 app.use(boolParser());
 
 app.use("/api/", rateLimit(limiterAPI));
-app.use("/api/", require("./src/routes/api"));
+app.use("/api/users", require("./src/routes/api/users/index"));
 
 
 app.use((req, res) => {
