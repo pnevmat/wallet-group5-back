@@ -16,7 +16,7 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Set password for user"],
     },
-    confirmPassword: {
+    repeatPassword: {
       type: String,
       required: [true, "Confirm password for user"],
     },
