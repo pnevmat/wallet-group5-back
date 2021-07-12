@@ -16,7 +16,8 @@ router
   .get("/", guard, ctrl.getTransactions);
 router
   .post("/add", guard, validationCreateTransaction, ctrl.addTransaction);
-router.get("/statistics", guard, ctrl.getStatisticTransactions);
+router
+  .get("/statistics", guard, ctrl.getStatisticTransactions);
 
 
 module.exports = router;
