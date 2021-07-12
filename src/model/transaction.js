@@ -3,6 +3,10 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 
 const transactionSchema = new Schema(
     {
+        date: {
+            type: Date,
+            required: true,
+        },
         type: {
             type: String,
             enum: ["income", "cost"],
@@ -13,6 +17,7 @@ const transactionSchema = new Schema(
         comments: {
             type: String,
             trim: true,
+            stringType: "lowercase",
         },
         owner: {
             type: SchemaTypes.ObjectId,
@@ -20,18 +25,8 @@ const transactionSchema = new Schema(
         },
         category: {
             type: String,
-            enum: [
-                "Основные расходы",
-                "Продукты",
-                "Машина",
-                "Забота о себе",
-                "Забота о детях",
-                "Товары для дома",
-                "Образование",
-                "Досуг",
-                "Прочее",
-                "Другие расходы"
-            ]
+            trim: true,
+            stringType: "lowercase",
         }
     },
     {

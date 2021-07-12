@@ -17,14 +17,14 @@ const register = async (req, res, next) => {
       });
     }
 
-    const { id, name, email, avatarURL, balance } = await Users.create(
+    const { id, name, email, avatarURL, balance, category } = await Users.create(
       req.body
     );
 
     return res.status(HttpCode.CREATED).json({
       status: "success",
       code: HttpCode.CREATED,
-      user: { id, name, email, avatarURL, balance },
+      user: { id, name, email, avatarURL, balance, category },
     });
   } catch (error) {
     next(error);
@@ -65,11 +65,11 @@ const logout = async (req, res, next) => {
 const currentUser = async (req, res, next) => {
   try {
     const id = req.user.id;
-    const { name, email, balance } = await Users.findById(id);
+    const { name, email, balance, category } = await Users.findById(id);
     return res.status(HttpCode.OK).json({
       status: "OK",
       code: HttpCode.OK,
-      user: { name, email, balance },
+      user: { name, email, balance, category },
     });
   } catch (error) {
     next(error);
@@ -90,10 +90,25 @@ const currentBalance = async (req, res, next) => {
   }
 };
 
+const currentCategory = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const { category } = await Users.findById(id);
+    return res.status(HttpCode.OK).json({
+      status: "OK",
+      code: HttpCode.OK,
+      user: { category },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
   currentUser,
   currentBalance,
+  currentCategory,
 };

@@ -1,16 +1,20 @@
 const { query } = require("express");
 const Transaction = require("../model/transaction");
+const { updateStartDate, updateEndDate } = require("../helpers/updateDate");
 
 const getTransactions = async (userId, query) => {
     const {
         sortBy,
         sortByDesc,
         filter,
-        limit = 10,
+        limit = 20,
         offset = 0,
+        month,
+        year,
     } = query;
-
-    const optionsSearch = { owner: userId };
+    const startDate = updateStartDate(month, year);
+    const endDate = updateEndDate(month, year).toISOString();
+    const optionsSearch = { owner: userId, date: { $gte: startDate, $lt: endDate }, };
     const results = await Transaction.paginate(optionsSearch, {
         limit,
         offset,
@@ -33,6 +37,20 @@ const getTransactionById = async (userId, transactionId) => {
     }).populate({
         path: "owner",
         select: "name email balance",
+    });
+    return result;
+};
+
+const getTransactionsByDate = async (userId, body) => {
+    const { month, year } = body;
+    const startDate = updateStartDate(month, year);
+    const endDate = updateEndDate(month, year).toISOString();
+    const result = await Transaction.find({
+        date: { $gte: startDate, $lt: endDate },
+        owner: userId,
+    }).populate({
+        path: "owner",
+        select: "name",
     });
     return result;
 };
@@ -73,4 +91,5 @@ module.exports = {
     addTransaction,
     removeTransaction,
     updateTransaction,
+    getTransactionsByDate,
 };
