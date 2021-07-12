@@ -25,6 +25,9 @@ const updateUserBalance = async (id, balance) => {
   return await User.updateOne({ _id: id }, { balance });
 };
 
+const updateUserCategory = async (id, category) => {
+  return await User.updateOne({ _id: id }, { category });
+};
 
 module.exports = {
   findById,
@@ -33,4 +36,5 @@ module.exports = {
   create,
   updateToken,
   updateUserBalance,
+  updateUserCategory,
 };

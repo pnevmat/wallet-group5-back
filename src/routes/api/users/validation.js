@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
+const { HttpCode } = require("../../../helpers/constants");
 
 const schemaCreateUser = Joi.object({
   name: Joi.string().min(3).max(30).required(),
@@ -24,7 +25,7 @@ const validate = async (schema, obj, next) => {
     next();
   } catch (err) {
     next({
-      status: 400,
+      status: HttpCode.BAD_REQUEST,
       message: err.message.replace(/"/g, ""),
     });
   }

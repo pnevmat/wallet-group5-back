@@ -34,7 +34,19 @@ const userSchema = new Schema(
         return gravatar.url(this.email, { s: "250" }, true);
       },
     },
-    category: { type: Array },
+    category: {
+      type: Array,
+      default: ["Основные расходы",
+        "Продукты",
+        "Машина",
+        "Забота о себе",
+        "Забота о детях",
+        "Товары для дома",
+        "Образование",
+        "Досуг",
+        "Прочее",
+        "Другие расходы"],
+    },
     balance: {
       type: Number,
       default: 0,

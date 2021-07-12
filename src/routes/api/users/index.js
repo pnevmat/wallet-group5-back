@@ -13,6 +13,7 @@ router.post("/login", validationLoginUser, ctrl.login);
 router.post("/logout", guard, ctrl.logout);
 router.get("/getUserData", guard, ctrl.currentUser);
 router.get("/balance", guard, ctrl.currentBalance);
+router.get("/category", guard, ctrl.currentCategory);
 
 
 

@@ -1,6 +1,7 @@
 const Transactions = require("../repositories/transactions");
 const { HttpCode } = require("../helpers/constants");
-const UpdateBalance = require("../helpers/updateBalance")
+const UpdateDataUser = require("../helpers/updateDataUser");
+const { incomeSum, costSum, getCategories } = require("../helpers/oprationsTracsactions");
 
 const getTransactions = async (req, res, next) => {
     try {
@@ -25,7 +26,8 @@ const addTransaction = async (req, res, next) => {
         const transaction = await Transactions.addTransaction(userId, req.body);
 
         if (transaction) {
-            await UpdateBalance.updateBalance(userId, transaction);
+            await UpdateDataUser.updateBalance(userId, transaction);
+            await UpdateDataUser.updateCategory(userId, transaction);
             return res
                 .status(HttpCode.CREATED)
                 .json({ status: "success", code: HttpCode.CREATED, data: { transaction } });
@@ -40,9 +42,23 @@ const addTransaction = async (req, res, next) => {
     }
 };
 
-const getCategory = async (req, res, next) => {
+const getStatisticTransactions = async (req, res, next) => {
     try {
+        const userId = req.user.id;
+        const transactions = await Transactions.getTransactionsByDate(
+            userId,
+            req.body,
+        );
 
+        const incomeBalance = incomeSum(transactions);
+        const costBalance = costSum(transactions);
+        const categories = getCategories(transactions);
+
+        return res.json({
+            status: "success",
+            code: HttpCode.OK,
+            data: { categories, incomeBalance, costBalance },
+        });
     } catch (error) {
         next(error)
     }
@@ -51,5 +67,5 @@ const getCategory = async (req, res, next) => {
 module.exports = {
     getTransactions,
     addTransaction,
-    getCategory,
+    getStatisticTransactions,
 };

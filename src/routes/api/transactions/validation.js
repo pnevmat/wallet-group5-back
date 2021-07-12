@@ -1,14 +1,26 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
+const { HttpCode } = require("../../../helpers/constants");
 
 const schemaCreateTransaction = Joi.object({
-  type: Joi.string().required().message({ "string.pattern.base": `Type transaction be must only income or cost` }),
+  date: Joi.string().required(),
+  type: Joi.string().required(),
   amount: Joi.number().required(),
   comments: Joi.string().optional(),
-  category: Joi.array().required(),
+  category: Joi.string().pattern(new RegExp("^[а-яА-ЯёЁa-zA-Z0-9 ]+$")).required(),
 });
 
-
+const validate = async (schema, obj, next) => {
+  try {
+    await schema.validateAsync(obj);
+    next();
+  } catch (err) {
+    next({
+      status: HttpCode.BAD_REQUEST,
+      message: err.message.replace(/"/g, ""),
+    });
+  }
+};
 
 module.exports = {
   validationCreateTransaction: (req, res, next) => {
