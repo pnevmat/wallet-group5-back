@@ -96,10 +96,11 @@ const currentCategory = async (req, res, next) => {
   try {
     const id = req.user.id;
     const { category } = await Users.findById(id);
+    const categories = category.map(el => el.name);
     return res.status(HttpCode.OK).json({
       status: "OK",
       code: HttpCode.OK,
-      user: { category },
+      user: { categories },
     });
   } catch (error) {
     next(error);
