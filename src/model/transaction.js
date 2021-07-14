@@ -1,6 +1,8 @@
 const { Schema, model, SchemaTypes } = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
+
+
 const transactionSchema = new Schema(
     {
         date: {
@@ -27,7 +29,7 @@ const transactionSchema = new Schema(
             type: String,
             trim: true,
             stringType: "lowercase",
-        }
+        },
     },
     {
         versionKey: false,

@@ -1,4 +1,5 @@
 const Users = require("../repositories/users");
+const { randomColor, randomNums } = require("../helpers/oprationsTracsactions");
 
 const updateBalance = async (userId, transaction) => {
     const user = await Users.findById(userId);
@@ -18,14 +19,16 @@ const updateBalance = async (userId, transaction) => {
 
 const updateCategory = async (userId, transaction) => {
     const user = await Users.findById(userId);
-    let userCategory = user.category;
+    const userCategory = user.category;
+    console.log(userCategory);
     const transactionCategory = transaction.category;
     const newTransactionCategory = transactionCategory.charAt(0).toUpperCase() + transactionCategory.slice(1);
-    let category = userCategory.find(item => item == newTransactionCategory);
+    const category = userCategory.map(el => el.name).find(name => name == newTransactionCategory);
+    console.log(category);
     if (category) {
         userCategory;
     } else {
-        userCategory.push(newTransactionCategory);
+        userCategory.push({ name: newTransactionCategory, color: randomColor(randomNums(147, 255)) });
     }
     return Users.updateUserCategory(userId, userCategory);
 }

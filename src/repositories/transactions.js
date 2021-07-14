@@ -9,12 +9,8 @@ const getTransactions = async (userId, query) => {
         filter,
         limit = 20,
         offset = 0,
-        month,
-        year,
     } = query;
-    const startDate = updateStartDate(month, year);
-    const endDate = updateEndDate(month, year).toISOString();
-    const optionsSearch = { owner: userId, date: { $gte: startDate, $lt: endDate }, };
+    const optionsSearch = { owner: userId };
     const results = await Transaction.paginate(optionsSearch, {
         limit,
         offset,
