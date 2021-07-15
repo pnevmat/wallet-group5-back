@@ -66,8 +66,29 @@ const getStatisticTransactions = async (req, res, next) => {
     }
 }
 
+const getAllStatisticTransactions = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const { category } = req.user;
+        const allTransactions = await Transactions.getAllTransactions(userId);
+        const incomeBalance = incomeSum(allTransactions);
+        const costBalance = costSum(allTransactions);
+        const categoriesTransactions = getCategories(allTransactions);
+        const newCategories = concatArray(categoriesTransactions, category);
+        return res.json({
+            status: "success",
+            code: HttpCode.OK,
+            data: { incomeBalance, costBalance, categories: { ...newCategories } },
+        });
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 module.exports = {
     getTransactions,
     addTransaction,
     getStatisticTransactions,
+    getAllStatisticTransactions,
 };

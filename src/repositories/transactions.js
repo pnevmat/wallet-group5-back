@@ -37,6 +37,16 @@ const getTransactionById = async (userId, transactionId) => {
     return result;
 };
 
+const getAllTransactions = async (userId) => {
+    const result = await Transaction.find({
+        owner: userId,
+    }).populate({
+        path: "owner",
+        select: "name",
+    });
+    return result;
+}
+
 const getTransactionsByDate = async (userId, body) => {
     const { month, year } = body;
     const startDate = updateStartDate(month, year);
@@ -88,4 +98,5 @@ module.exports = {
     removeTransaction,
     updateTransaction,
     getTransactionsByDate,
+    getAllTransactions,
 };

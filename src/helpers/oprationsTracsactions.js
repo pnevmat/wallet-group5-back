@@ -40,7 +40,6 @@ const concatArray = (array1, array2) => {
 }
 
 const getColorsCategories = (categories) => {
-    console.log(categories);
     const colors = categories.map((el) => el);
     return colors;
 }
