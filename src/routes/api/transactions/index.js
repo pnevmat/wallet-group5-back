@@ -17,6 +17,8 @@ router
 router
   .post("/add", guard, validationCreateTransaction, ctrl.addTransaction);
 router
+  .get("/all-statistics", guard, ctrl.getAllStatisticTransactions);
+router
   .get("/statistics", guard, ctrl.getStatisticTransactions);
 
 

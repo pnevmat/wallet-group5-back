@@ -20,11 +20,9 @@ const updateBalance = async (userId, transaction) => {
 const updateCategory = async (userId, transaction) => {
     const user = await Users.findById(userId);
     const userCategory = user.category;
-    console.log(userCategory);
     const transactionCategory = transaction.category;
     const newTransactionCategory = transactionCategory.charAt(0).toUpperCase() + transactionCategory.slice(1);
     const category = userCategory.map(el => el.name).find(name => name == newTransactionCategory);
-    console.log(category);
     if (category) {
         userCategory;
     } else {
