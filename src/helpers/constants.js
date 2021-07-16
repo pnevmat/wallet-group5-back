@@ -25,9 +25,39 @@ const limiterAPI = {
 };
 
 
+const categories = [
+  {
+    name: "Основные расходы", color: "#FED057",
+  },
+  {
+    name: "Продукты", color: "#FFD8D0",
+  },
+  {
+    name: "Машина", color: "#FD9498",
+  },
+  {
+    name: "Забота о себе", color: "#C5BAFF",
+  },
+  {
+    name: "Забота о детях", color: "#6E78E8",
+  },
+  {
+    name: "Товары для дома", color: "#4A56E2",
+  },
+  {
+    name: "Образование", color: "#81E1FF",
+  },
+  {
+    name: "Досуг", color: "#24CCA7",
+  },
+  {
+    name: "Другие расходы", color: "#00AD84",
+  }
+];
+
 
 module.exports = {
   HttpCode,
-  // Subscription,
+  categories,
   limiterAPI,
 };

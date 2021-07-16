@@ -1,3 +1,6 @@
+const Transaction = require("../model/transaction");
+const { v4: uuidv4 } = require("uuid");
+
 const incomeSum = (transactions) => {
     const incomeArr = transactions.filter(el => el.type == "income");
     const income = incomeArr.reduce(
@@ -16,26 +19,53 @@ const costSum = (transactions) => {
     return cost;
 }
 
+
+const getLastTransactionsBalance = async (date, userId) => {
+    const transaction = await Transaction.find({
+        date: { $lt: date },
+        owner: userId,
+    })
+        .sort({ date: -1 })
+        .limit(1)
+    if (!transaction || transaction.length === 0) {
+        return 0;
+    } else return transaction[0].balance;
+}
+
+
+
+const calcNewBalance = (balance, body) => {
+    const amount = body.amount;
+    const type = body.type;
+    if (type === "income") {
+        return parseInt(balance + amount);
+    } else if (type === "cost") {
+        return parseInt(balance - amount);
+    } else throw new Error('Incorrect transaction type');
+}
+
+
 const getCategories = (transactions) => {
-    const categories = transactions.map((el) => ({ name: el.category, amount: el.amount }));
+    const categories = transactions.filter((el) => el.type == "cost").map((el) => ({ "name": el.category, "amount": el.amount }));
     return categories;
 }
 
+
 const concatArray = (array1, array2) => {
     let arr = []
-    array1.forEach((elem) => {
+    array1.map((elem) => {
         let amount = (typeof arr[elem.name] !== "undefined") ? arr[elem.name].amount + elem.amount : elem.amount;
         let color = (typeof arr[elem.name] !== "undefined") ? arr[elem.name].color = elem.color : elem.color;
-        let row = { "amount": amount, "color": color }
+        let row = { id: uuidv4(), name: elem.name, amount: amount, color: color };
         arr[elem.name] = Object.assign((arr[elem.name] || {}), row);
     })
     array2.map((item) => {
         return {
-            name: item.name,
             amount: (typeof arr[item.name] !== "undefined") ? arr[item.name].amount : 0,
             color: (typeof arr[item.name] !== "undefined") ? arr[item.name].color = item.color : "",
         };
     });
+    
     return arr;
 }
 
@@ -78,4 +108,6 @@ module.exports = {
     randomNums,
     getColorsCategories,
     concatArray,
+    getLastTransactionsBalance,
+    calcNewBalance,
 }
