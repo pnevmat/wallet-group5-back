@@ -1,5 +1,4 @@
 const Users = require("../repositories/users");
-const Transactions = require("../repositories/transactions");
 const { HttpCode } = require("../helpers/constants");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -13,7 +12,7 @@ const register = async (req, res, next) => {
       return res.status(HttpCode.CONFLICT).json({
         status: "error",
         code: HttpCode.CONFLICT,
-        message: "Email or name in use",
+        message: "Email in use",
       });
     }
 

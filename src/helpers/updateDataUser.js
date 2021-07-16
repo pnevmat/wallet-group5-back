@@ -26,7 +26,7 @@ const updateCategory = async (userId, transaction) => {
     if (category) {
         userCategory;
     } else {
-        userCategory.push({ name: newTransactionCategory, color: randomColor(randomNums(147, 255)) });
+        userCategory.push({ name: newTransactionCategory, color: randomColor(randomNums(0, 100)) });
     }
     return Users.updateUserCategory(userId, userCategory);
 }

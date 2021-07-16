@@ -1,6 +1,7 @@
 const { query } = require("express");
 const Transaction = require("../model/transaction");
 const { updateStartDate, updateEndDate } = require("../helpers/updateDate");
+const { getLastTransactionsBalance, calcNewBalance } = require("../helpers/oprationsTracsactions");
 
 const getTransactions = async (userId, query) => {
     const {
@@ -62,7 +63,15 @@ const getTransactionsByDate = async (userId, body) => {
 };
 
 const addTransaction = async (userId, body) => {
-    const result = await Transaction.create({ owner: userId, ...body });
+    const lastBalance = await getLastTransactionsBalance(body.date, userId);
+    const newBalance = await calcNewBalance(lastBalance, body);
+    const result = await Transaction.create({ owner: userId, ...body, balance: newBalance });
+    return result;
+};
+
+
+const updateTransactionBalance = async ({ owner: userId, balance }) => {
+    const result = await Transaction.updateOne({ owner: userId }, { balance });
     return result;
 };
 
@@ -99,4 +108,5 @@ module.exports = {
     updateTransaction,
     getTransactionsByDate,
     getAllTransactions,
+    updateTransactionBalance,
 };

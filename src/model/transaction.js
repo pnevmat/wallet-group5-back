@@ -29,6 +29,11 @@ const transactionSchema = new Schema(
             type: String,
             trim: true,
             stringType: "lowercase",
+            default: "Основной доход", //TODO написати функцію 
+        },
+        balance: {
+            type: Number,
+            required: true,
         },
     },
     {
