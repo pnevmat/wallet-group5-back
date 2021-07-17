@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const { HttpCode } = require("../../../helpers/constants");
 
 const schemaCreateTransaction = Joi.object({
-  date: Joi.string().required(),
+  date: Joi.date().required(),
   type: Joi.string().required(),
   amount: Joi.number().required(),
   comments: Joi.string().optional(),
