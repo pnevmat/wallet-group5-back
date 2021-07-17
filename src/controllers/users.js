@@ -20,7 +20,7 @@ const register = async (req, res, next) => {
       req.body
     );
     const payload = { id };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" });
     await Users.updateToken(id, token);
     return res.status(HttpCode.CREATED).json({
       status: "success",

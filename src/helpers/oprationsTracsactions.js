@@ -1,6 +1,7 @@
 const Transaction = require("../model/transaction");
 const { v4: uuidv4 } = require("uuid");
 
+
 const incomeSum = (transactions) => {
     const incomeArr = transactions.filter(el => el.type == "income");
     const income = incomeArr.reduce(
@@ -51,8 +52,21 @@ const getCategories = (transactions) => {
 }
 
 
+const arrayClone = (src) => {
+    let dest = (src instanceof Array) ? [] : {};
+    Object.setPrototypeOf(dest, Object.getPrototypeOf(src));
+    Object.getOwnPropertyNames(src).forEach(name => {
+        const descriptor = Object.getOwnPropertyDescriptor(src, name);
+        Object.defineProperty(dest, name, descriptor);
+    });
+    console.log(dest)
+    return dest;
+}
+
+
 const concatArray = (array1, array2) => {
     let arr = []
+
     array1.map((elem) => {
         let amount = (typeof arr[elem.name] !== "undefined") ? arr[elem.name].amount + elem.amount : elem.amount;
         let color = (typeof arr[elem.name] !== "undefined") ? arr[elem.name].color = elem.color : elem.color;
@@ -65,9 +79,10 @@ const concatArray = (array1, array2) => {
             color: (typeof arr[item.name] !== "undefined") ? arr[item.name].color = item.color : "",
         };
     });
-    
-    return arr;
+
+    return arrayClone(Object.values(arr));
 }
+
 
 const getColorsCategories = (categories) => {
     const colors = categories.map((el) => el);
