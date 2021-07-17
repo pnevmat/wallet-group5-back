@@ -20,7 +20,6 @@ const costSum = (transactions) => {
     return cost;
 }
 
-
 const getLastTransactionsBalance = async (date, userId) => {
     const transaction = await Transaction.find({
         date: { $lt: date },
@@ -59,7 +58,6 @@ const arrayClone = (src) => {
         const descriptor = Object.getOwnPropertyDescriptor(src, name);
         Object.defineProperty(dest, name, descriptor);
     });
-    console.log(dest)
     return dest;
 }
 

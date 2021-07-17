@@ -33,7 +33,7 @@ const transactionSchema = new Schema(
         },
         balance: {
             type: Number,
-            required: true,
+            // required: true,
         },
     },
     {
