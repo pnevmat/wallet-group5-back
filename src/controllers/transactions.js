@@ -2,7 +2,7 @@ const Transactions = require("../repositories/transactions");
 const Users = require("../repositories/users");
 const { HttpCode } = require("../helpers/constants");
 const UpdateDataUser = require("../helpers/updateDataUser");
-const { incomeSum, costSum, getCategories, concatArray, updateBalanceTransactions } = require("../helpers/oprationsTracsactions");
+const { incomeSum, costSum, getCategories, concatArray } = require("../helpers/oprationsTracsactions");
 const { v4: uuidv4 } = require("uuid");
 
 const getTransactions = async (req, res, next) => {
@@ -46,39 +46,35 @@ const addTransaction = async (req, res, next) => {
 const getStatisticTransactions = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const { category } = req.user;
+        const { category, balance } = req.user;
         console.log(category)
         const transactions = await Transactions.getTransactionsByDate(
             userId,
             req.body,
         );
+        const incomeBalance = incomeSum(transactions);
+        const costBalance = costSum(transactions);
         if (transactions.length !== 0) {
-            const incomeBalance = incomeSum(transactions);
-            const costBalance = costSum(transactions);
             const categoriesTransactions = getCategories(transactions);
-            console.log(categoriesTransactions);
             const newCategories = concatArray(categoriesTransactions, category);
-            console.log(newCategories)
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
-                data: { incomeBalance, costBalance, categories: { ...newCategories } },
+                data: { balance, incomeBalance, costBalance, categories: [...newCategories] },
             });
         } else {
-            const incomeBalance = incomeSum(transactions);
-            const costBalance = costSum(transactions);
             const categoriesWithNull = category.map((elem) => {
                 return {
                     id: uuidv4(),
                     name: elem.name,
                     amount: 0,
                     color: elem.color,
-                }
-            })
+                };
+            });
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
-                data: { incomeBalance, costBalance, categories: [...categoriesWithNull] },
+                data: { balance, incomeBalance, costBalance, categories: [...categoriesWithNull] },
             });
         }
     } catch (error) {
@@ -89,17 +85,33 @@ const getStatisticTransactions = async (req, res, next) => {
 const getAllStatisticTransactions = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const { category } = req.user;
+        const { category, balance } = req.user;
         const allTransactions = await Transactions.getAllTransactions(userId);
         const incomeBalance = incomeSum(allTransactions);
         const costBalance = costSum(allTransactions);
-        const categoriesTransactions = getCategories(allTransactions);
-        const newCategories = concatArray(categoriesTransactions, category);
-        return res.json({
-            status: "success",
-            code: HttpCode.OK,
-            data: { incomeBalance, costBalance, categories: { ...newCategories } },
-        });
+        if (allTransactions.length !== 0) {
+            const categoriesTransactions = getCategories(allTransactions);
+            const newCategories = concatArray(categoriesTransactions, category);
+            return res.json({
+                status: "success",
+                code: HttpCode.OK,
+                data: { balance, incomeBalance, costBalance, categories: [...newCategories] },
+            });
+        } else {
+            const categoriesWithNull = category.map((elem) => {
+                return {
+                    id: uuidv4(),
+                    name: elem.name,
+                    amount: 0,
+                    color: elem.color,
+                };
+            });
+            return res.json({
+                status: "success",
+                code: HttpCode.OK,
+                data: { balance, incomeBalance, costBalance, categories: [...categoriesWithNull] },
+            });
+        }
     } catch (error) {
         next(error)
     }
