@@ -12,7 +12,7 @@ const register = async (req, res, next) => {
       return res.status(HttpCode.CONFLICT).json({
         status: "error",
         code: HttpCode.CONFLICT,
-        message: "Email in use",
+        message: "Provided email already exists",
       });
     }
 
@@ -45,7 +45,7 @@ const login = async (req, res, next) => {
     }
     const id = user.id;
     const payload = { id };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" });
     await Users.updateToken(id, token);
     return res.json({ status: "OK", code: HttpCode.OK, data: { token } });
   } catch (error) {
