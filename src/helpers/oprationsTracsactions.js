@@ -35,7 +35,7 @@ const getLastTransactionsBalance = async (date, userId) => {
 
 
 const calcNewBalance = (balance, body) => {
-    const amount = body.amount;
+    const amount = Number(body.amount);
     const type = body.type;
     if (type === "income") {
         return parseInt(balance + amount);

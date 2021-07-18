@@ -31,7 +31,7 @@ const addTransaction = async (req, res, next) => {
             await UpdateDataUser.updateCategory(userId, transaction);
             return res
                 .status(HttpCode.CREATED)
-                .json({ status: "success", code: HttpCode.CREATED, data: { transaction } });
+                .json({ status: "success", code: HttpCode.CREATED, transaction });
         }
         return res.status(HttpCode.BAD_REQUEST).json({
             status: "error",
