@@ -1,30 +1,40 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "version": "2.0.2",
-    "title": "Swagger test",
-    "description": "Showing off swagger-ui-express",
+    "version": "1.0.0",
+    "title": "Wallet group#5 back",
+    "description": "Showing off swager-ui-express",
     "license": {
       "name": "MIT",
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
-  "servers": [{ "url": "http://localhost:3000" }],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
   "tags": [
     {
-      "name": "Auth",
+      "name": "Users",
       "description": "Authorization endpoints"
     }
   ],
   "paths": {
-    "/auth/register": {
+    "/api/users/register": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Users"
+        ],
         "summary": "User registration",
         "parameters": [],
-        "security": [{ "Bearer": [] }],
+        "security": [],
         "requestBody": {
           "description": "Registration's object",
           "required": true,
@@ -57,13 +67,174 @@
           }
         }
       }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "User Logion",
+        "parameters": [],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "Logins's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email or password is wrong",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "User Logout",
+        "parameters": [
+          {
+            "in": "header",
+            "required": true,
+            "name": "Authorization",
+            "description": "User's token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {}
+          },
+          "401": {
+            "description": "Missing header with authorization token",
+            "content": {}
+          },
+          "500": {
+            "description": "Server error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/users/getUserData": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user data",
+        "parameters": [
+          {
+            "in": "header",
+            "required": true,
+            "name": "Authorization",
+            "description": "User's token"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "Logins's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email or password is wrong",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "RegistrationRequest": {
         "type": "object",
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password",
+          "repeatPassword",
+          "name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+          "repeatPassword": {
+            "type": "string",
+            "description": "Confirm user's password",
+            "example": "qwerty123"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
         "properties": {
           "email": {
             "type": "string",
@@ -82,22 +253,106 @@
         "items": {
           "type": "object",
           "properties": {
+            "id": {
+              "type": "number",
+              "description": "User's id",
+              "example": "32143232436545474"
+            },
+            "name": {
+              "type": "string",
+              "description": "User's name",
+              "example": "User"
+            },
             "email": {
               "type": "string",
               "description": "User's email",
               "format": "email"
             },
-            "userId": {
+            "avatarURL": {
+              "type": "url",
+              "description": "User's avatar(gravatar)",
+              "example": "http://www.example.com/avatar"
+            },
+            "balance": {
               "type": "number",
-              "description": "User's id",
-              "example": "32143232436545474"
+              "description": "User's balance",
+              "example": 0
+            },
+            "category": {
+              "type": "array",
+              "description": "User's categories",
+              "example": [
+                {
+                  "name": "category1",
+                  "color": "#000000"
+                },
+                {
+                  "name": "category2",
+                  "color": "#FFFFFF"
+                }
+              ]
+            },
+            "token": {
+              "type": "string",
+              "description": "User's token",
+              "example": "1234245465rfegtjtrt565"
             }
           }
         },
         "example": [
-          { "email": "1@gmail.com", "userId": "1" },
-          { "email": "2@gmail.com", "userId": "2" }
+          {
+            "id": "1",
+            "email": "1@gmail.com",
+            "avatarURL": "http://www.example.com/avatar1",
+            "balance": 0,
+            "category": [
+              {
+                "name": "category1",
+                "color": "#000000"
+              },
+              {
+                "name": "category2",
+                "color": "#FFFFFF"
+              }
+            ],
+            "token": "rgeg343556uutgeut"
+          },
+          {
+            "id": "2",
+            "email": "2@gmail.com",
+            "avatarURL": "http://www.example.com/avatar2",
+            "balance": 0,
+            "category": [
+              {
+                "name": "category1",
+                "color": "#000000"
+              },
+              {
+                "name": "category2",
+                "color": "#FFFFFF"
+              }
+            ],
+            "token": "rgeg34355h65hyi7876uutgeut"
+          }
         ]
+      },
+      "LoginResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string",
+              "description": "User's token",
+              "example": "1234245465rfegtjtrt565"
+            }
+          },
+          "example": [
+            {
+              "token": "wtghfdf4556789jgfdgby987655"
+            }
+          ]
+        }
       }
     },
     "securitySchemes": {

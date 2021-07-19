@@ -20,6 +20,9 @@ router
   .get("/all-statistics", guard, ctrl.getAllStatisticTransactions);
 router
   .get("/statistics", guard, ctrl.getStatisticTransactions);
+router
+  .put("/:transactionId", guard, ctrl.updateTransaction)
+  .delete("/:transactionId", guard, ctrl.removeTransaction);
 
 
 module.exports = router;
