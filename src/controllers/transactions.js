@@ -53,7 +53,8 @@ const getStatisticTransactions = async (req, res, next) => {
         );
         const incomeBalance = incomeSum(transactions);
         const costBalance = costSum(transactions);
-        if (transactions.length !== 0) {
+        const costTransactions = transactions.filter(el => el.type === "cost");
+        if (costTransactions.length !== 0) {
             const categoriesTransactions = getCategories(transactions);
             const newCategories = concatArray(categoriesTransactions, category);
             return res.json({
@@ -88,7 +89,8 @@ const getAllStatisticTransactions = async (req, res, next) => {
         const allTransactions = await Transactions.getAllTransactions(userId);
         const incomeBalance = incomeSum(allTransactions);
         const costBalance = costSum(allTransactions);
-        if (allTransactions.length !== 0) {
+        const costTransactions = allTransactions.filter(el => el.type === "cost");
+        if (costTransactions.length !== 0) {
             const categoriesTransactions = getCategories(allTransactions);
             const newCategories = concatArray(categoriesTransactions, category);
             return res.json({
@@ -149,7 +151,6 @@ const removeTransaction = async (req, res, next) => {
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
-                data: { transaction },
             });
         }
         return res.status(HttpCode.NOT_FOUND).json({

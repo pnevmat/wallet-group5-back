@@ -20,7 +20,12 @@ const prepareMonth = (month) => {
     } else return `0${month}`
 };
 
+const getMonthFromString = (month) => {
+    return new Date(Date.parse(month + " 1, 2012")).getMonth() + 1
+};
+
 module.exports = {
     updateStartDate,
     updateEndDate,
+    getMonthFromString,
 }

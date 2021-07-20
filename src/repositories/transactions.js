@@ -1,6 +1,6 @@
 const { query } = require("express");
 const Transaction = require("../model/transaction");
-const { updateStartDate, updateEndDate } = require("../helpers/updateDate");
+const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
 const { getLastTransactionsBalance, calcNewBalance } = require("../helpers/oprationsTracsactions");
 
 const getTransactions = async (userId, query) => {
@@ -50,8 +50,9 @@ const getAllTransactions = async (userId) => {
 
 const getTransactionsByDate = async (userId, body) => {
     const { month, year } = body;
-    const startDate = updateStartDate(month, year);
-    const endDate = updateEndDate(month, year).toISOString();
+    const monthIntger = getMonthFromString(month);
+    const startDate = updateStartDate(monthIntger, year);
+    const endDate = updateEndDate(monthIntger, year).toISOString();
     const result = await Transaction.find({
         date: { $gte: startDate, $lt: endDate },
         owner: userId,
