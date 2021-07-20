@@ -25,7 +25,7 @@ const updateCategory = async (userId, transaction) => {
     const category = userCategory.map(el => el.name).find(name => name == newTransactionCategory);
     if (category) {
         userCategory;
-    } else {
+    } else if (transaction.type === "cost") {
         userCategory.push({ name: newTransactionCategory, color: randomColor(randomNums(0, 100)) });
     }
     return Users.updateUserCategory(userId, userCategory);
