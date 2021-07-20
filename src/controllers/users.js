@@ -44,10 +44,11 @@ const login = async (req, res, next) => {
       });
     }
     const id = user.id;
+    const { email, name, balance, avatarURL } = user;
     const payload = { id };
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" });
     await Users.updateToken(id, token);
-    return res.json({ status: "OK", code: HttpCode.OK, data: { token } });
+    return res.json({ status: "OK", code: HttpCode.OK, data: { token, id, email, name, balance, avatarURL } });
   } catch (error) {
     next(error);
   }
