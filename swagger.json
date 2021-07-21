@@ -356,7 +356,7 @@
         }
       }
     },
-    "/api/transactions/all-statistics": {
+    "/api/transactions/statistics": {
       "get": {
         "tags": [
           "Transactions"
@@ -394,14 +394,12 @@
             "content": {}
           }
         }
-      }
-    },
-    "/api/transactions/statistics": {
-      "get": {
+      },
+      "post": {
         "tags": [
           "Transactions"
         ],
-        "summary": "Get all-statistics transactions",
+        "summary": "Get statistics transactions of date",
         "parameters": [],
         "security": [
           {
@@ -409,7 +407,7 @@
           }
         ],
         "requestBody": {
-          "description": "Add transaction object",
+          "description": "Get statistics of date",
           "required": true,
           "content": {
             "application/json": {
@@ -646,10 +644,10 @@
         "type": "object",
         "required": [],
         "properties": {
-          "mounth": {
+          "month": {
             "type": "number",
-            "description": "Mounth",
-            "example": 7
+            "description": "Month",
+            "example": "Jul"
           },
           "year": {
             "type": "number",
