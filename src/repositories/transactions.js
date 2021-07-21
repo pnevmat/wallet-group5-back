@@ -1,7 +1,7 @@
 const { query } = require("express");
 const Transaction = require("../model/transaction");
 const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
-const { getLastTransactionsBalance, calcNewBalance } = require("../helpers/oprationsTracsactions");
+const { getLastTransactionsBalance, calcNewBalance, getCurrentBalance, sortArrayByDate } = require("../helpers/oprationsTracsactions");
 
 const getTransactions = async (userId, query) => {
     const {
@@ -35,7 +35,7 @@ const getTransactionById = async (userId, transactionId) => {
         path: "owner",
         select: "name email balance",
     });
-    return result;
+    return sortArrayByDate(result);
 };
 
 const getAllTransactions = async (userId) => {
@@ -67,6 +67,7 @@ const addTransaction = async (userId, body) => {
     const lastBalance = await getLastTransactionsBalance(body.date, userId);
     const newBalance = await calcNewBalance(lastBalance, body);
     const result = await Transaction.create({ owner: userId, ...body, balance: newBalance });
+    await getCurrentBalance(body.date, newBalance, userId, false);
     return result;
 };
 

@@ -17,9 +17,8 @@ router
 router
   .post("/add", guard, validationCreateTransaction, ctrl.addTransaction);
 router
-  .get("/all-statistics", guard, ctrl.getAllStatisticTransactions);
-router
-  .get("/statistics", guard, ctrl.getStatisticTransactions);
+  .get("/statistics", guard, ctrl.getAllStatisticTransactions)
+  .post("/statistics", guard, ctrl.getStatisticTransactions);
 router
   .put("/:transactionId", guard, ctrl.updateTransaction)
   .delete("/:transactionId", guard, ctrl.removeTransaction);
