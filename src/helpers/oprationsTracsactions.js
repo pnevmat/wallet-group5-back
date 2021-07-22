@@ -40,14 +40,6 @@ const getCurrentBalance = async (date, currentBalance, userId, isLastTransaction
     });
 }
 
-const sortArrayByDate = (transactions) => {
-    return transactions.sort(function (a, b) {
-        if (a.date > b.date) { return 1 };
-        if (a.date < b.date) { return -1 };
-        return 0;
-    });
-}
-
 const calcNewBalance = (balance, body) => {
     const amount = Number(body.amount);
     const type = body.type;
@@ -138,5 +130,4 @@ module.exports = {
     getLastTransactionsBalance,
     calcNewBalance,
     getCurrentBalance,
-    sortArrayByDate,
 }

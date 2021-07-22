@@ -20,6 +20,7 @@ const transactionSchema = new Schema(
             type: String,
             trim: true,
             stringType: "lowercase",
+            default: "-",
         },
         owner: {
             type: SchemaTypes.ObjectId,
