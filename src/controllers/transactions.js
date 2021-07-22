@@ -5,6 +5,7 @@ const UpdateDataUser = require("../helpers/updateDataUser");
 const { incomeSum, costSum, getCategories, concatArray } = require("../helpers/oprationsTracsactions");
 const { v4: uuidv4 } = require("uuid");
 
+
 const getTransactions = async (req, res, next) => {
     try {
         const userId = req.user.id;
@@ -12,6 +13,9 @@ const getTransactions = async (req, res, next) => {
             userId,
             req.query
         );
+        transactions.sort(function (a, b) {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+        })
         return res.json({
             status: "success",
             code: HttpCode.OK,
