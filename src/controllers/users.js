@@ -67,11 +67,11 @@ const logout = async (req, res, next) => {
 const currentUser = async (req, res, next) => {
   try {
     const id = req.user.id;
-    const { name, email, balance, category } = await Users.findById(id);
+    const { name, email, balance, category, avatarURL } = await Users.findById(id);
     return res.status(HttpCode.OK).json({
       status: "OK",
       code: HttpCode.OK,
-      user: { name, email, balance, category },
+      user: { name, email, balance, category, avatarURL },
     });
   } catch (error) {
     next(error);
