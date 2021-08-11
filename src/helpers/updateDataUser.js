@@ -13,7 +13,7 @@ const updateBalance = async (userId, transaction) => {
     } else {
         throw new Error('Incorrect transaction type');
     }
-    return Users.updateUserBalance(userId, updatedBalance);
+    return await Users.updateUserBalance(userId, updatedBalance);
 
 };
 
