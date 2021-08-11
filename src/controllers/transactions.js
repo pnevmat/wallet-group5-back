@@ -30,6 +30,7 @@ const addTransaction = async (req, res, next) => {
     try {
         const userId = req.user.id;
         const transaction = await Transactions.addTransaction(userId, req.body);
+        const transactions = await Transactions.getAllTransactions(userId);
         if (transaction) {
             await UpdateDataUser.updateBalance(userId, transaction);
             await UpdateDataUser.updateCategory(userId, transaction);

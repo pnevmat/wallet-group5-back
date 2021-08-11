@@ -32,14 +32,6 @@ const getLastTransactionsBalance = async (date, userId) => {
     } else return transaction[0].balance;
 }
 
-const getCurrentBalance = async (date, currentBalance, userId, isLastTransaction) => {
-    let balance = currentBalance;
-    const transactions = await Transaction.find({
-        owner: userId,
-        date: isLastTransaction ? { $gte: date } : { $gt: date },
-    });
-}
-
 const calcNewBalance = (balance, body) => {
     const amount = Number(body.amount);
     const type = body.type;
@@ -49,6 +41,43 @@ const calcNewBalance = (balance, body) => {
         return parseInt(balance - amount);
     } else throw new Error('Incorrect transaction type');
 }
+
+const recalculateBalance = async (
+    date,
+    currentBalance,
+    userId,
+    isLatestTransaction
+) => {
+    let balance = currentBalance
+    const transactions = await Transaction.find({
+        date: isLatestTransaction ? { $gte: date } : { $gt: date },
+        owner: userId,
+    }).sort({ date: 'asc' })
+
+    await transactions.forEach(async (el) => {
+        balance = calcNewBalance(balance, el)
+        await Transaction.updateOne(
+            { _id: el.id },
+            { balance: balance },
+            function (err) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log('Success update')
+                }
+            }
+        )
+    })
+}
+
+const getCurrentBalance = async (date, currentBalance, userId, isLastTransaction) => {
+    let balance = currentBalance;
+    const transactions = await Transaction.find({
+        owner: userId,
+        date: isLastTransaction ? { $gte: date } : { $gt: date },
+    });
+}
+
 
 
 const getCategories = (transactions) => {
@@ -129,5 +158,6 @@ module.exports = {
     concatArray,
     getLastTransactionsBalance,
     calcNewBalance,
+    recalculateBalance,
     getCurrentBalance,
 }
