@@ -1,18 +1,27 @@
 const Users = require("../repositories/users");
 const { randomColor, randomNums } = require("../helpers/oprationsTracsactions");
 
+// const updateBalance = async (userId, transaction) => {
+//     const user = await Users.findById(userId);
+//     let updatedBalance = user.balance;
+//     const amount = Number(transaction.amount);
+
+//     if (transaction.type === 'cost') {
+//         updatedBalance -= amount;
+//     } else if (transaction.type === 'income') {
+//         updatedBalance += amount;
+//     } else {
+//         throw new Error('Incorrect transaction type');
+//     }
+//     return await Users.updateUserBalance(userId, updatedBalance);
+
+// };
+
 const updateBalance = async (userId, transaction) => {
     const user = await Users.findById(userId);
     let updatedBalance = user.balance;
-    const amount = Number(transaction.amount);
-
-    if (transaction.type === 'cost') {
-        updatedBalance -= amount;
-    } else if (transaction.type === 'income') {
-        updatedBalance += amount;
-    } else {
-        throw new Error('Incorrect transaction type');
-    }
+    const balance = Number(transaction.balance);
+    updatedBalance = balance;
     return await Users.updateUserBalance(userId, updatedBalance);
 
 };

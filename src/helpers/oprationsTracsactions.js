@@ -42,6 +42,16 @@ const calcNewBalance = (balance, body) => {
     } else throw new Error('Incorrect transaction type');
 }
 
+const calcDellBalance = (balance, transaction) => {
+    const amount = Number(transaction.amount);
+    const type = transaction.type;
+    if (type === "income") {
+        return parseInt(balance - amount);
+    } else if (type === "cost") {
+        return parseInt(balance + amount);
+    } else throw new Error('Incorrect transaction type');
+}
+
 const recalculateBalance = async (
     date,
     currentBalance,
@@ -70,6 +80,34 @@ const recalculateBalance = async (
     })
 }
 
+const recalculateDellBalance = async (
+    date,
+    currentBalance,
+    userId,
+    isLatestTransaction
+) => {
+    let balance = currentBalance
+    const transactions = await Transaction.find({
+        date: isLatestTransaction ? { $gte: date } : { $gt: date },
+        owner: userId,
+    }).sort({ date: 'asc' })
+
+    await transactions.forEach(async (el) => {
+        balance = calcDellBalance(balance, el)
+        await Transaction.updateOne(
+            { _id: el.id },
+            { balance: balance },
+            function (err) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log('Success update')
+                }
+            }
+        )
+    })
+}
+
 const getCurrentBalance = async (date, currentBalance, userId, isLastTransaction) => {
     let balance = currentBalance;
     const transactions = await Transaction.find({
@@ -77,7 +115,6 @@ const getCurrentBalance = async (date, currentBalance, userId, isLastTransaction
         date: isLastTransaction ? { $gte: date } : { $gt: date },
     });
 }
-
 
 
 const getCategories = (transactions) => {
@@ -160,4 +197,6 @@ module.exports = {
     calcNewBalance,
     recalculateBalance,
     getCurrentBalance,
+    calcDellBalance,
+    recalculateDellBalance,
 }
