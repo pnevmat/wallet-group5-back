@@ -132,6 +132,8 @@ const updateTransaction = async (req, res, next) => {
             req.body
         );
         if (transaction) {
+            await UpdateDataUser.updateBalance(userId, transaction);
+            await UpdateDataUser.updateCategory(userId, transaction);
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
@@ -151,7 +153,8 @@ const updateTransaction = async (req, res, next) => {
 const removeTransaction = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const transaction = await Transactions.removeTransaction(userId, req.params.transactionId);
+        const transactionId = req.params.transactionId;
+        const transaction = await Transactions.removeTransaction(userId, transactionId);
         if (transaction) {
             return res.json({
                 status: "success",

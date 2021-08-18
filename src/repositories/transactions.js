@@ -1,7 +1,8 @@
 const { query } = require("express");
 const Transaction = require("../model/transaction");
+const Users = require("../model/user");
 const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
-const { getLastTransactionsBalance, calcNewBalance, getCurrentBalance, recalculateBalance } = require("../helpers/oprationsTracsactions");
+const { getLastTransactionsBalance, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, calcDellBalance } = require("../helpers/oprationsTracsactions");
 
 const getTransactions = async (userId, query) => {
     const {
@@ -66,6 +67,7 @@ const getTransactionsByDate = async (userId, body) => {
 
 const addTransaction = async (userId, body) => {
     const lastBalance = await getLastTransactionsBalance(body.date, userId);
+    console.log(lastBalance);
     const newBalance = await calcNewBalance(lastBalance, body);
     const result = await Transaction.create({
         owner: userId,
@@ -84,28 +86,38 @@ const updateTransactionBalance = async ({ owner: userId, balance }) => {
 };
 
 const removeTransaction = async (userId, transactionId) => {
-    const result = await Transaction.findOneAndRemove({
-        _id: transactionId,
+    const transaction = await Transaction.findByIdAndRemove({
         owner: userId,
+        _id: transactionId,
     }).populate({
         path: "owner",
         select: "name email balance",
     });
-    return result;
+    console.log(transaction)
+    const lastBalance = await getLastTransactionsBalance(transaction.date, userId);
+    const newBalance = await calcDellBalance(lastBalance, transaction);
+    await recalculateDellBalance(transaction.date, newBalance, userId, false);
+    return transaction;
 };
 
 const updateTransaction = async (userId, transactionId, body) => {
-    const result = await Transaction.findOneAndUpdate(
-        { _id: transactionId, owner: userId },
-        body,
+    const lastBalance = await getLastTransactionsBalance(body.date, userId);
+    const newBalance = await calcNewBalance(lastBalance, body);
+    const transaction = await Transaction.findOneAndUpdate(
+        {
+            _id: transactionId, owner: userId,
+        },
+        { ...body, balance: newBalance },
         {
             new: true,
         }
     ).populate({
         path: "owner",
         select: "name email balance",
-    });
-    return result;
+    }
+    );
+    await recalculateBalance(body.date, newBalance, userId, false);
+    return transaction;
 };
 
 module.exports = {
