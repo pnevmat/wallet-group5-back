@@ -1,8 +1,8 @@
 const { query } = require("express");
 const Transaction = require("../model/transaction");
-const Users = require("../model/user");
+const UpdateDataUser = require("../helpers/updateDataUser");
 const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
-const { getLastTransactionsBalance, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, calcDellBalance } = require("../helpers/oprationsTracsactions");
+const { getLastTransactionsBalance, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, calcDellBalance } = require("../helpers/operationsTracsactions");
 
 const getTransactions = async (userId, query) => {
     const {
@@ -93,10 +93,25 @@ const removeTransaction = async (userId, transactionId) => {
         path: "owner",
         select: "name email balance",
     });
-    console.log(transaction)
-    const lastBalance = await getLastTransactionsBalance(transaction.date, userId);
-    const newBalance = await calcDellBalance(lastBalance, transaction);
-    await recalculateDellBalance(transaction.date, newBalance, userId, false);
+    const lastTransaction = await Transaction.find({
+        date: { $lt: transaction.date },
+        owner: userId,
+    })
+        .sort({ date: -1 })
+        .limit(1);
+
+    console.log(lastTransaction);
+    if (lastTransaction.length !== 0) {
+        const lastBalance = await getLastTransactionsBalance(transaction.date, userId);
+        const newBalance = await calcDellBalance(lastBalance, lastTransaction);
+        console.log(newBalance)
+        await recalculateBalance(transaction.date, newBalance, userId, false);
+        await UpdateDataUser.updateBalance(userId, lastTransaction);
+    } else {
+        await recalculateBalance(transaction.date, 0, userId, false);
+        await UpdateDataUser.updateBalance(userId, lastTransaction);
+    }
+    // const result = await getAllTransactions(userId);
     return transaction;
 };
 

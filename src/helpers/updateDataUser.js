@@ -1,5 +1,5 @@
 const Users = require("../repositories/users");
-const { randomColor, randomNums } = require("../helpers/oprationsTracsactions");
+const { randomColor, randomNums } = require("./operationsTracsactions");
 
 // const updateBalance = async (userId, transaction) => {
 //     const user = await Users.findById(userId);
@@ -20,9 +20,15 @@ const { randomColor, randomNums } = require("../helpers/oprationsTracsactions");
 const updateBalance = async (userId, transaction) => {
     const user = await Users.findById(userId);
     let updatedBalance = user.balance;
-    const balance = Number(transaction.balance);
-    updatedBalance = balance;
-    return await Users.updateUserBalance(userId, updatedBalance);
+    if (transaction.length !== 0) {
+        const balance = Number(transaction.balance);
+        updatedBalance = balance;
+        return await Users.updateUserBalance(userId, updatedBalance);
+    } else {
+        const balance = 0;
+        updatedBalance = balance;
+        return await Users.updateUserBalance(userId, updatedBalance);
+    }
 
 };
 

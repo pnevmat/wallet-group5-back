@@ -2,7 +2,7 @@ const Transactions = require("../repositories/transactions");
 const Users = require("../repositories/users");
 const { HttpCode } = require("../helpers/constants");
 const UpdateDataUser = require("../helpers/updateDataUser");
-const { incomeSum, costSum, getCategories, concatArray } = require("../helpers/oprationsTracsactions");
+const { incomeSum, costSum, getCategories, concatArray } = require("../helpers/operationsTracsactions");
 const { v4: uuidv4 } = require("uuid");
 
 
