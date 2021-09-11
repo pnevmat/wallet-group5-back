@@ -1,5 +1,5 @@
 const Users = require("../repositories/users");
-const { randomColor, randomNums } = require("../helpers/oprationsTracsactions");
+const { randomColor, randomNums } = require("./operationsTracsactions");
 
 // const updateBalance = async (userId, transaction) => {
 //     const user = await Users.findById(userId);
