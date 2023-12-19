@@ -18,7 +18,7 @@
     "url": "https://github.com/pnevmat/wallet-group5-back/issues"
   },
   "homepage": "https://github.com/pnevmat/wallet-group5-back#readme",
-  "main": "app.js",
+  "main": "src/server.js",
   "keywords": [],
   "dependencies": {
     "@sendgrid/mail": "^7.4.5",
