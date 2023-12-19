@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "Back end for wallet app",
   "scripts": {
-		"build": "cjs",
-    "start": "node ./bin/server.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon ./bin/server.js",
+    "start": "node ./src/server.js",
+    "start:dev": "cross-env NODE_ENV=development nodemon ./src/server.js",
     "lint": "eslint **/*.js",
     "lint:fix": "eslint --fix **/*.js"
   },
