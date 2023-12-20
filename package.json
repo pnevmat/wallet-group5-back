@@ -4,7 +4,7 @@
   "description": "Back end for wallet app",
   "scripts": {
     "start": "node src/server.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon ./src/server.js",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/server.js",
     "lint": "eslint **/*.js",
     "lint:fix": "eslint --fix **/*.js"
   },
