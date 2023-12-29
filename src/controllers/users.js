@@ -1,4 +1,5 @@
 const Users = require("../repositories/users");
+const {createCategory, editCategory, deleteCategory} = require("../helpers/updateDataUser")
 const { HttpCode } = require("../helpers/constants");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -96,16 +97,98 @@ const currentCategory = async (req, res, next) => {
   try {
     const id = req.user.id;
     const { category } = await Users.findById(id);
-    const categories = category.map(el => el.name);
+
     return res.status(HttpCode.OK).json({
       status: "OK",
       code: HttpCode.OK,
-      user: { categories },
+      user: { categories: category },
     });
   } catch (error) {
     next(error);
   }
 };
+
+const addCategory = async (req, res, next) => {
+	const email = req.body.email;
+	const category = req.body.category;
+	const user = await Users.findByEmail(email);
+
+	if (!user) {
+		return res.status(HttpCode.CONFLICT).json({
+			status: "error",
+			code: HttpCode.CONFLICT,
+			message: "User not found",
+		});
+	}
+	
+	const categoryDb = await createCategory(user.id, category);
+
+	return res.status(HttpCode.CREATED).json({
+		status: "success",
+		code: HttpCode.CREATED,
+		category: categoryDb
+	});
+}
+
+const updateCategory = async (req, res, next) => {
+	const email = req.body.email;
+	const category = req.body.category;
+	const user = await Users.findByEmail(email);
+
+	if (!user) {
+		return res.status(HttpCode.CONFLICT).json({
+			status: "error",
+			code: HttpCode.CONFLICT,
+			message: "User not found",
+		});
+	}
+
+	const editedCategoryDb = await editCategory(user.id, category);
+
+	if (!editedCategoryDb) {
+		return res.status(HttpCode.CONFLICT).json({
+			status: "error",
+			code: HttpCode.CONFLICT,
+			message: "Category not found",
+		});
+	}
+
+	return res.status(HttpCode.OK).json({
+		status: "success",
+		code: HttpCode.OK,
+		category: editedCategoryDb
+	});
+}
+
+const removeCategory = async (req, res, next) => {
+	const email = req.query.email;
+	const categoryId = req.query.id;
+	const user = await Users.findByEmail(email);
+	
+	if (!user) {
+		return res.status(HttpCode.CONFLICT).json({
+			status: "error",
+			code: HttpCode.CONFLICT,
+			message: "User not found",
+		});
+	}
+
+	const removedCategory = await deleteCategory(user.id, categoryId);
+
+	if (!removedCategory) {
+		return res.status(HttpCode.CONFLICT).json({
+			status: "error",
+			code: HttpCode.CONFLICT,
+			message: "Category not found",
+		});
+	}
+
+	return res.status(HttpCode.OK).json({
+		status: "success",
+		code: HttpCode.OK,
+		category: removedCategory
+	});
+}
 
 module.exports = {
   register,
@@ -114,4 +197,7 @@ module.exports = {
   currentUser,
   currentBalance,
   currentCategory,
+	addCategory,
+	updateCategory,
+	removeCategory
 };

@@ -33,7 +33,7 @@ const addTransaction = async (req, res, next) => {
         const transactions = await Transactions.getAllTransactions(userId);
         if (transaction) {
             await UpdateDataUser.updateBalance(userId, transaction);
-            await UpdateDataUser.updateCategory(userId, transaction);
+            // await UpdateDataUser.updateCategory(userId, transaction);
             return res
                 .status(HttpCode.CREATED)
                 .json({ status: "success", code: HttpCode.CREATED, transaction });

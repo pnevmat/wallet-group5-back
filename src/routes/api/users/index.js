@@ -6,6 +6,8 @@ const guard = require("../../../helpers/guard");
 const {
   validationCreateUser,
   validationLoginUser,
+	validationAddCategory,
+	validationEditCategory
 } = require("./validation");
 
 router.post("/register", validationCreateUser, ctrl.register);
@@ -14,6 +16,9 @@ router.post("/logout", guard, ctrl.logout);
 router.get("/getUserData", guard, ctrl.currentUser);
 router.get("/balance", guard, ctrl.currentBalance);
 router.get("/category", guard, ctrl.currentCategory);
+router.post("/category", validationAddCategory, ctrl.addCategory);
+router.put("/category", validationEditCategory, ctrl.updateCategory);
+router.delete("/category", guard, ctrl.removeCategory);
 
 
 

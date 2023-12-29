@@ -5,7 +5,7 @@ const gravatar = require("gravatar");
 const { categories } = require("../helpers/constants");
 
 const SALT_WORK_FACTOR = 8;
-
+// Переписать юзер схему чтобы константных категорий небыло а был пустой массив
 const userSchema = new Schema(
   {
     name: {
@@ -37,7 +37,7 @@ const userSchema = new Schema(
     },
     category: {
       type: Array,
-      default: categories,
+      default: [],
     },
     balance: {
       type: Number,

@@ -18,6 +18,26 @@ const schemaLoginUser = Joi.object({
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]+$")).required(),
 });
 
+const schemaAddCategory = Joi.object({
+	email: Joi.string().email().required(),
+	category: Joi.object({
+		id: Joi.string(),
+		type: Joi.string().required(),
+		name: Joi.string().required(),
+		color: Joi.string()
+	})
+})
+
+const schemaEditCategory = Joi.object({
+	email: Joi.string().email().required(),
+	category: Joi.object({
+		id: Joi.string().required(),
+		type: Joi.string().required(),
+		name: Joi.string().required(),
+		color: Joi.string().required()
+	})
+})
+
 
 const validate = async (schema, obj, next) => {
   try {
@@ -38,4 +58,10 @@ module.exports = {
   validationLoginUser: (req, res, next) => {
     return validate(schemaLoginUser, req.body, next);
   },
+	validationAddCategory: (req, res, next) => {
+		return validate(schemaAddCategory, req.body, next);
+	},
+	validationEditCategory: (req, res, next) => {
+		return validate(schemaEditCategory, req.body, next);
+	}
 };
