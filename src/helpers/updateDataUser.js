@@ -18,11 +18,12 @@ const { nanoid } = require("nanoid");
 
 // };
 
-const updateBalance = async (userId, transaction) => {
+const updateBalance = async (userId, transaction, delAmmount) => {
     const user = await Users.findById(userId);
     let updatedBalance = user.balance;
+
     if (transaction.length !== 0) {
-        const balance = Number(transaction.balance);
+        const balance = Number(delAmmount ? transaction[0].balance + delAmmount : transaction[0].balance);
         updatedBalance = balance;
         return await Users.updateUserBalance(userId, updatedBalance);
     } else {

@@ -30,7 +30,7 @@ const addTransaction = async (req, res, next) => {
     try {
         const userId = req.user.id;
         const transaction = await Transactions.addTransaction(userId, req.body);
-        const transactions = await Transactions.getAllTransactions(userId);
+        // const transactions = await Transactions.getAllTransactions(userId);
         if (transaction) {
             await UpdateDataUser.updateBalance(userId, transaction);
             // await UpdateDataUser.updateCategory(userId, transaction);
@@ -152,13 +152,16 @@ const updateTransaction = async (req, res, next) => {
 
 const removeTransaction = async (req, res, next) => {
     try {
-        const userId = req.user.id;
+        const userEmail = req.query.email;
         const transactionId = req.params.transactionId;
-        const transaction = await Transactions.removeTransaction(userId, transactionId);
+				const user = await Users.findByEmail(userEmail);
+        const transaction = await Transactions.removeTransaction(user.id, transactionId);
+
         if (transaction) {
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
+								transaction: transaction
             });
         }
         return res.status(HttpCode.NOT_FOUND).json({
@@ -167,6 +170,7 @@ const removeTransaction = async (req, res, next) => {
             message: "Not found",
         });
     } catch (error) {
+			console.log('Remove transaction error: ', error);
         next(error);
     }
 };

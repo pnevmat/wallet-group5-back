@@ -11,7 +11,7 @@ const transactionSchema = new Schema(
         },
         type: {
             type: String,
-            enum: ["income", "cost"],
+            // enum: ["income", "cost"],
         },
         amount: {
             type: Number,

@@ -22,14 +22,24 @@ const costSum = (transactions) => {
 
 const getLastTransactionsBalance = async (date, userId) => {
     const transaction = await Transaction.find({
-        date: { $lt: date },
+        date: {  $gte: date, $lt: new Date() },
         owner: userId,
-    })
-        .sort({ date: -1 })
-        .limit(1)
+    }).sort({ date: -1 }).limit(1);
+		console.log('Transaction when del transaction: ', transaction);
     if (!transaction || transaction.length === 0) {
         return 0;
     } else return transaction[0].balance;
+}
+
+const getLastPrevTransactionBalace = async (date, userId) => {
+	const transaction = await Transaction.find({
+		date: {  $lt: date },
+		owner: userId,
+	}).sort({ date: -1 }).limit(1);
+
+	if (!transaction || transaction.length === 0) {
+		return 0;
+	} else return transaction[0].balance;
 }
 
 const calcNewBalance = (balance, body) => {
@@ -43,8 +53,8 @@ const calcNewBalance = (balance, body) => {
 }
 
 const calcDellBalance = (balance, transaction) => {
-    const amount = Number(transaction.amount);
-    const type = transaction.type;
+    const amount = Number(transaction.length ? transaction[0].amount : transaction.amount);
+    const type = transaction.length ? transaction[0].type : transaction.type;
     if (type === "income") {
         return parseInt(balance - amount);
     } else if (type === "cost") {
@@ -54,18 +64,20 @@ const calcDellBalance = (balance, transaction) => {
 
 const recalculateBalance = async (
     date,
-    currentBalance,
+    actionTransaction,
     userId,
-    isLatestTransaction
+    isLatestTransaction,
+		type
 ) => {
-    let balance = currentBalance
+    let balance = 0;
     const transactions = await Transaction.find({
         date: isLatestTransaction ? { $gte: date } : { $gt: date },
         owner: userId,
     }).sort({ date: 'asc' })
 
     await transactions.forEach(async (el) => {
-        balance = calcNewBalance(balance, el)
+        balance = type === 'del' ? calcDellBalance(el.balance, actionTransaction) : calcNewBalance(el.balance, actionTransaction);
+				console.log('Balance in recalc balance: ', balance);
         await Transaction.updateOne(
             { _id: el.id },
             { balance: balance },
@@ -194,6 +206,7 @@ module.exports = {
     getColorsCategories,
     concatArray,
     getLastTransactionsBalance,
+		getLastPrevTransactionBalace,
     calcNewBalance,
     recalculateBalance,
     getCurrentBalance,

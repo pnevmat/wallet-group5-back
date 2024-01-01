@@ -2,7 +2,7 @@ const { query } = require("express");
 const Transaction = require("../model/transaction");
 const UpdateDataUser = require("../helpers/updateDataUser");
 const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
-const { getLastTransactionsBalance, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, calcDellBalance } = require("../helpers/operationsTracsactions");
+const { getLastTransactionsBalance, getLastPrevTransactionBalace, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, calcDellBalance } = require("../helpers/operationsTracsactions");
 
 const getTransactions = async (userId, query) => {
     const {
@@ -66,9 +66,8 @@ const getTransactionsByDate = async (userId, body) => {
 };
 
 const addTransaction = async (userId, body) => {
-    const lastBalance = await getLastTransactionsBalance(body.date, userId);
-    console.log(lastBalance);
-    const newBalance = await calcNewBalance(lastBalance, body);
+    const prevBalance = await getLastPrevTransactionBalace(body.date, userId);
+    const newBalance = await calcNewBalance(prevBalance, body);
     const result = await Transaction.create({
         owner: userId,
         ...body,
@@ -93,23 +92,23 @@ const removeTransaction = async (userId, transactionId) => {
         path: "owner",
         select: "name email balance",
     });
-    const lastTransaction = await Transaction.find({
-        date: { $lt: transaction.date },
+		console.log('Removed transaction: ', transaction);
+    const lastTransactions = await Transaction.find({
+        date: { $gte: transaction.date, $lt: new Date() },
         owner: userId,
-    })
-        .sort({ date: -1 })
-        .limit(1);
+    }).sort({ date: -1 }).limit(1);
 
-    console.log(lastTransaction);
-    if (lastTransaction.length !== 0) {
+    console.log('Last transactions: ', lastTransactions);
+		// Решить проблемму неправильного пересчета баланса
+    if (lastTransactions.length !== 0) {
         const lastBalance = await getLastTransactionsBalance(transaction.date, userId);
-        const newBalance = await calcDellBalance(lastBalance, lastTransaction);
-        console.log(newBalance)
-        await recalculateBalance(transaction.date, newBalance, userId, false);
-        await UpdateDataUser.updateBalance(userId, lastTransaction);
+        const newBalance = await calcDellBalance(lastBalance, transaction);
+
+        await recalculateBalance(transaction.date, transaction, userId, false, 'del');
+        await UpdateDataUser.updateBalance(userId, lastTransactions, transaction.amount);
     } else {
-        await recalculateBalance(transaction.date, 0, userId, false);
-        await UpdateDataUser.updateBalance(userId, lastTransaction);
+        await recalculateBalance(transaction.date, 0, userId, false, 'del');
+        await UpdateDataUser.updateBalance(userId, lastTransactions);
     }
     // const result = await getAllTransactions(userId);
     return transaction;
