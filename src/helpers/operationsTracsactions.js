@@ -25,7 +25,7 @@ const getLastTransactionsBalance = async (date, userId) => {
         date: {  $gte: date, $lt: new Date() },
         owner: userId,
     }).sort({ date: -1 }).limit(1);
-		console.log('Transaction when del transaction: ', transaction);
+		console.log('Last transaction: ', transaction);
     if (!transaction || transaction.length === 0) {
         return 0;
     } else return transaction[0].balance;
@@ -36,7 +36,7 @@ const getLastPrevTransactionBalace = async (date, userId) => {
 		date: {  $lt: date },
 		owner: userId,
 	}).sort({ date: -1 }).limit(1);
-
+	console.log('Last prev transaction: ', transaction);
 	if (!transaction || transaction.length === 0) {
 		return 0;
 	} else return transaction[0].balance;
@@ -74,7 +74,7 @@ const recalculateBalance = async (
         date: isLatestTransaction ? { $gte: date } : { $gt: date },
         owner: userId,
     }).sort({ date: 'asc' })
-
+		console.log('Recalc balace transactions: ', transactions);
     await transactions.forEach(async (el) => {
         balance = type === 'del' ? calcDellBalance(el.balance, actionTransaction) : calcNewBalance(el.balance, actionTransaction);
 				console.log('Balance in recalc balance: ', balance);

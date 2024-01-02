@@ -73,8 +73,8 @@ const addTransaction = async (userId, body) => {
         ...body,
         balance: newBalance
     });
-    await recalculateBalance(body.date, newBalance, userId, false);
-    // const result = await getAllTransactions(userId);
+    await recalculateBalance(body.date, body, userId, false);
+
     return result;
 };
 
@@ -101,16 +101,13 @@ const removeTransaction = async (userId, transactionId) => {
     console.log('Last transactions: ', lastTransactions);
 		// Решить проблемму неправильного пересчета баланса
     if (lastTransactions.length !== 0) {
-        const lastBalance = await getLastTransactionsBalance(transaction.date, userId);
-        const newBalance = await calcDellBalance(lastBalance, transaction);
-
         await recalculateBalance(transaction.date, transaction, userId, false, 'del');
         await UpdateDataUser.updateBalance(userId, lastTransactions, transaction.amount);
     } else {
         await recalculateBalance(transaction.date, 0, userId, false, 'del');
-        await UpdateDataUser.updateBalance(userId, lastTransactions);
+        await UpdateDataUser.updateBalance(userId, lastTransactions.length ? lastTransactions : [transaction], transaction.amount);
     }
-    // const result = await getAllTransactions(userId);
+
     return transaction;
 };
 
