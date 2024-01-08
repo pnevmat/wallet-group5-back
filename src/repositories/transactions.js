@@ -2,7 +2,7 @@ const { query } = require("express");
 const Transaction = require("../model/transaction");
 const UpdateDataUser = require("../helpers/updateDataUser");
 const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
-const { getLastTransactionsBalance, getLastPrevTransactionBalace, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, calcDellBalance } = require("../helpers/operationsTracsactions");
+const { getLastTransactionsBalance, getLastPrevTransactionBalace, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, recalculateUpdateBalance, calcDellBalance } = require("../helpers/operationsTracsactions");
 
 const getTransactions = async (userId, query) => {
     const {
@@ -29,7 +29,7 @@ const getTransactions = async (userId, query) => {
 };
 
 const getTransactionById = async (userId, transactionId) => {
-    const result = await Transaction.findOne({
+    const result = await Transaction.find({
         _id: transactionId,
         owner: userId,
     }).populate({
@@ -110,25 +110,31 @@ const removeTransaction = async (userId, transactionId) => {
 
     return transaction;
 };
-
+// Адаптировать функцию к изменению не только суммы но и типа транзакции (доход\расход)
 const updateTransaction = async (userId, transactionId, body) => {
-    const lastBalance = await getLastTransactionsBalance(body.date, userId);
-    const newBalance = await calcNewBalance(lastBalance, body);
-    const transaction = await Transaction.findOneAndUpdate(
-        {
-            _id: transactionId, owner: userId,
-        },
-        { ...body, balance: newBalance },
-        {
-            new: true,
-        }
-    ).populate({
-        path: "owner",
-        select: "name email balance",
-    }
-    );
-    await recalculateBalance(body.date, newBalance, userId, false);
-    return transaction;
+	const transaction = await Transaction.findOneAndUpdate(
+		{
+			_id: transactionId, 
+			owner: userId,
+		},
+		{ ...body },
+		{new: true}
+	).populate({
+		path: "owner",
+		select: "name email balance",
+	});
+	console.log('Updated transaction: ', transaction);
+	const allTransactions = await Transaction.find({
+		owner: userId,
+	}).sort({ date: 'asc' });
+	console.log('All transactions: ', allTransactions);
+	if (allTransactions.length !== 0) {
+		const updatedTransactions = await recalculateUpdateBalance(allTransactions);
+		const difAmmount = updatedTransactions[updatedTransactions.length - 1].balance - allTransactions[allTransactions.length - 1].balance;
+		await UpdateDataUser.updateBalance(userId, [allTransactions[allTransactions.length - 1]], difAmmount);
+	}
+    
+  return transaction;
 };
 
 module.exports = {

@@ -52,6 +52,28 @@ const calcNewBalance = (balance, body) => {
     } else throw new Error('Incorrect transaction type');
 }
 
+const calcUpdateBalance = (currentEl, body, updateAmount, typeChange, prevDate, prevEl) => {
+	const type = body.type;
+	if (updateAmount === 0) return currentEl.balance;
+
+	if (typeChange === 'income' || typeChange === 'cost') {
+		return parseInt(currentEl.balance + updateAmount);
+	};
+
+	if (body.date !== prevDate) {
+		if (prevEl && currentEl.balance <= prevEl.balance - currentEl.amount + updateAmount) {
+			return parseInt(currentEl.balance);
+		}
+		return parseInt(currentEl.balance + updateAmount);
+	};
+
+	if (type === "income") {
+		return parseInt(currentEl.balance - updateAmount);
+	} else if (type === "cost") {
+		return parseInt(currentEl.balance + updateAmount);
+	} else throw new Error('Incorrect transaction type');
+};
+
 const calcDellBalance = (balance, transaction) => {
     const amount = Number(transaction.length ? transaction[0].amount : transaction.amount);
     const type = transaction.length ? transaction[0].type : transaction.type;
@@ -67,7 +89,10 @@ const recalculateBalance = async (
     actionTransaction,
     userId,
     isLatestTransaction,
-		type
+		type,
+		difAmount,
+		typeChange,
+		prevDate
 ) => {
     let balance = 0;
     const transactions = await Transaction.find({
@@ -75,8 +100,8 @@ const recalculateBalance = async (
         owner: userId,
     }).sort({ date: 'asc' })
 		console.log('Recalc balace transactions: ', transactions);
-    await transactions.forEach(async (el) => {
-        balance = type === 'del' ? calcDellBalance(el.balance, actionTransaction) : calcNewBalance(el.balance, actionTransaction);
+    await transactions.forEach(async (el, i) => {
+        balance = type === 'del' ? calcDellBalance(el.balance, actionTransaction) : type === 'update' ? calcUpdateBalance(el, actionTransaction, difAmount, typeChange, prevDate, transactions[i - 1]) : calcNewBalance(el.balance, actionTransaction);
 				console.log('Balance in recalc balance: ', balance);
         await Transaction.updateOne(
             { _id: el.id },
@@ -90,6 +115,58 @@ const recalculateBalance = async (
             }
         )
     })
+}
+
+const recalculateUpdateBalance = async (
+	transactions,
+) => {
+	let balance = 0;
+	const updatedTransactions = transactions.map((transaction, i) => {
+		if (i === 0 && transaction.amount !== transaction.balance) {
+			const newBalance = transaction.type === 'income' ? transaction.amount : -transaction.amount;
+			balance = transaction.type === 'income' ? transaction.amount : -transaction.amount;
+
+			return {...transaction, balance: newBalance};
+		};
+
+		if (i !== 0) {
+			if (transaction.type === 'income' && transaction.balance !== balance + transaction.amount) {
+				const newBalance = balance + transaction.amount;
+				balance = balance + transaction.amount;
+
+				return {...transaction, balance: newBalance};
+			};
+
+			if (transaction.type === 'cost' && transaction.balance !== balance - transaction.amount) {
+				const newBalance = balance - transaction.amount;
+				balance = balance - transaction.amount;
+
+				return {...transaction, balance: newBalance};
+			};
+		};
+		balance = transaction.balance;
+		console.log('Balance in recalc balance: ', balance);
+		return transaction;
+	});
+
+	await transactions.forEach(async (el, i) => {
+			// balance = 0;
+			// calcUpdateBalance(el, actionTransaction, difAmount, typeChange, prevDate, transactions[i - 1]);
+		if (el.balance !== updatedTransactions[i].balance) {
+			await Transaction.updateOne(
+				{ _id: el.id },
+				{ balance: updatedTransactions[i].balance },
+				function (err) {
+					if (err) {
+						console.log(err)
+					} else {
+						console.log('Success update')
+					}
+				}
+			)
+		}
+	})
+	return updatedTransactions;
 }
 
 const recalculateDellBalance = async (
@@ -208,8 +285,10 @@ module.exports = {
     getLastTransactionsBalance,
 		getLastPrevTransactionBalace,
     calcNewBalance,
+		calcUpdateBalance,
     recalculateBalance,
     getCurrentBalance,
     calcDellBalance,
     recalculateDellBalance,
+		recalculateUpdateBalance
 }

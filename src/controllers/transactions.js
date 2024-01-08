@@ -125,18 +125,19 @@ const getAllStatisticTransactions = async (req, res, next) => {
 const updateTransaction = async (req, res, next) => {
     try {
         const userId = req.user.id;
+				const transactionId = req.params.transactionId;
+				
         const transaction = await Transactions.updateTransaction(
             userId,
-            req.params.transactionId,
+            transactionId,
             req.body
         );
+				// console.log('Updated transaction: ', transaction);
         if (transaction) {
-            await UpdateDataUser.updateBalance(userId, transaction);
-            await UpdateDataUser.updateCategory(userId, transaction);
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
-                data: { transaction },
+                transaction,
             });
         }
         return res.status(HttpCode.NOT_FOUND).json({
