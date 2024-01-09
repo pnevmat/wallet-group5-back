@@ -73,8 +73,10 @@ const getStatisticTransactions = async (req, res, next) => {
                     name: elem.name,
                     amount: 0,
                     color: elem.color,
+										type: elem.type,
                 };
-            });
+            }).filter(el => el.type === "cost");
+						console.log('Categories with null: ', categoriesWithNull);
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
@@ -109,8 +111,9 @@ const getAllStatisticTransactions = async (req, res, next) => {
                     name: elem.name,
                     amount: 0,
                     color: elem.color,
+										type: elem.type,
                 };
-            });
+            }).filter(el => el.type === "cost");
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
@@ -132,7 +135,7 @@ const updateTransaction = async (req, res, next) => {
             transactionId,
             req.body
         );
-				// console.log('Updated transaction: ', transaction);
+
         if (transaction) {
             return res.json({
                 status: "success",

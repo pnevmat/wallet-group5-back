@@ -53,8 +53,11 @@ const getAllTransactions = async (userId) => {
 const getTransactionsByDate = async (userId, body) => {
     const { month, year } = body;
     const monthIntger = getMonthFromString(month);
+		console.log('Month from string: ', monthIntger);
     const startDate = updateStartDate(monthIntger, year);
+		console.log('Start date: ', startDate);
     const endDate = updateEndDate(monthIntger, year).toISOString();
+		console.log('End date: ', endDate);
     const result = await Transaction.find({
         date: { $gte: startDate, $lt: endDate },
         owner: userId,
@@ -62,6 +65,7 @@ const getTransactionsByDate = async (userId, body) => {
         path: "owner",
         select: "name",
     });
+		console.log('Found statistics transactions: ', result);
     return result;
 };
 
@@ -92,13 +96,12 @@ const removeTransaction = async (userId, transactionId) => {
         path: "owner",
         select: "name email balance",
     });
-		console.log('Removed transaction: ', transaction);
+
     const lastTransactions = await Transaction.find({
         date: { $gte: transaction.date, $lt: new Date() },
         owner: userId,
     }).sort({ date: -1 }).limit(1);
 
-    console.log('Last transactions: ', lastTransactions);
 		// Решить проблемму неправильного пересчета баланса
     if (lastTransactions.length !== 0) {
         await recalculateBalance(transaction.date, transaction, userId, false, 'del');
@@ -110,7 +113,7 @@ const removeTransaction = async (userId, transactionId) => {
 
     return transaction;
 };
-// Адаптировать функцию к изменению не только суммы но и типа транзакции (доход\расход)
+
 const updateTransaction = async (userId, transactionId, body) => {
 	const transaction = await Transaction.findOneAndUpdate(
 		{
