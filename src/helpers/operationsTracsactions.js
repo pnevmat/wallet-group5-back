@@ -150,8 +150,6 @@ const recalculateUpdateBalance = async (
 	});
 
 	await transactions.forEach(async (el, i) => {
-			// balance = 0;
-			// calcUpdateBalance(el, actionTransaction, difAmount, typeChange, prevDate, transactions[i - 1]);
 		if (el.balance !== updatedTransactions[i].balance) {
 			await Transaction.updateOne(
 				{ _id: el.id },

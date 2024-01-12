@@ -102,7 +102,6 @@ const removeTransaction = async (userId, transactionId) => {
         owner: userId,
     }).sort({ date: -1 }).limit(1);
 
-		// Решить проблемму неправильного пересчета баланса
     if (lastTransactions.length !== 0) {
         await recalculateBalance(transaction.date, transaction, userId, false, 'del');
         await UpdateDataUser.updateBalance(userId, lastTransactions, transaction.amount);

@@ -47,7 +47,7 @@ const getBudgets = async (req, res, next) => {
       next(error);
     }
 };
-// Переписать этот контроллер чтобы он сохранял в бд объект такого типа: {date: 2024-01-10, budget: [{id: 'dffkj', category: 'fdvfg', planAmount: 1500, factAmmount: 500}]}
+
 const addBudget = async (req, res, next) => {
     try {
         const userId = req.user.id;
