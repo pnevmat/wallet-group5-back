@@ -41,7 +41,7 @@ const createCategory = async (userId, category) => {
 	const machCategory = categoriesByType.find(typeCategory => typeCategory.name == category.name);
 
 	const color = randomColor(randomNums(0, 100))
-	console.log('Color: ', color);
+
 	if (!machCategory) {
 		userCategory.push({...category, color, id: nanoid() });
 	}

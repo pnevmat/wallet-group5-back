@@ -76,7 +76,6 @@ const getStatisticTransactions = async (req, res, next) => {
 										type: elem.type,
                 };
             }).filter(el => el.type === "cost");
-						console.log('Categories with null: ', categoriesWithNull);
             return res.json({
                 status: "success",
                 code: HttpCode.OK,
@@ -173,7 +172,6 @@ const removeTransaction = async (req, res, next) => {
             message: "Not found",
         });
     } catch (error) {
-			console.log('Remove transaction error: ', error);
         next(error);
     }
 };

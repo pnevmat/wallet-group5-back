@@ -51,22 +51,20 @@ const getAllTransactions = async (userId) => {
 }
 
 const getTransactionsByDate = async (userId, body) => {
-    const { month, year } = body;
-    const monthIntger = getMonthFromString(month);
-		console.log('Month from string: ', monthIntger);
-    const startDate = updateStartDate(monthIntger, year);
-		console.log('Start date: ', startDate);
-    const endDate = updateEndDate(monthIntger, year).toISOString();
-		console.log('End date: ', endDate);
-    const result = await Transaction.find({
-        date: { $gte: startDate, $lt: endDate },
-        owner: userId,
-    }).populate({
-        path: "owner",
-        select: "name",
-    });
-		console.log('Found statistics transactions: ', result);
-    return result;
+  const { month, year } = body;
+  const monthIntger = getMonthFromString(month);
+  const startDate = updateStartDate(monthIntger, year);
+  const endDate = updateEndDate(monthIntger, year).toISOString();
+
+  const result = await Transaction.find({
+    date: { $gte: startDate, $lt: endDate },
+    owner: userId,
+  }).populate({
+    path: "owner",
+    select: "name",
+  });
+
+  return result;
 };
 
 const addTransaction = async (userId, body) => {
@@ -115,21 +113,18 @@ const removeTransaction = async (userId, transactionId) => {
 
 const updateTransaction = async (userId, transactionId, body) => {
 	const transaction = await Transaction.findOneAndUpdate(
-		{
-			_id: transactionId, 
-			owner: userId,
-		},
+		{_id: transactionId, owner: userId},
 		{ ...body },
 		{new: true}
 	).populate({
 		path: "owner",
 		select: "name email balance",
 	});
-	console.log('Updated transaction: ', transaction);
+
 	const allTransactions = await Transaction.find({
 		owner: userId,
 	}).sort({ date: 'asc' });
-	console.log('All transactions: ', allTransactions);
+
 	if (allTransactions.length !== 0) {
 		const updatedTransactions = await recalculateUpdateBalance(allTransactions);
 		const difAmmount = updatedTransactions[updatedTransactions.length - 1].balance - allTransactions[allTransactions.length - 1].balance;

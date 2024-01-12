@@ -25,7 +25,7 @@ const getLastTransactionsBalance = async (date, userId) => {
         date: {  $gte: date, $lt: new Date() },
         owner: userId,
     }).sort({ date: -1 }).limit(1);
-		console.log('Last transaction: ', transaction);
+	
     if (!transaction || transaction.length === 0) {
         return 0;
     } else return transaction[0].balance;
@@ -36,7 +36,7 @@ const getLastPrevTransactionBalace = async (date, userId) => {
 		date: {  $lt: date },
 		owner: userId,
 	}).sort({ date: -1 }).limit(1);
-	console.log('Last prev transaction: ', transaction);
+
 	if (!transaction || transaction.length === 0) {
 		return 0;
 	} else return transaction[0].balance;
@@ -99,20 +99,13 @@ const recalculateBalance = async (
         date: isLatestTransaction ? { $gte: date } : { $gt: date },
         owner: userId,
     }).sort({ date: 'asc' })
-		console.log('Recalc balace transactions: ', transactions);
+
     await transactions.forEach(async (el, i) => {
         balance = type === 'del' ? calcDellBalance(el.balance, actionTransaction) : type === 'update' ? calcUpdateBalance(el, actionTransaction, difAmount, typeChange, prevDate, transactions[i - 1]) : calcNewBalance(el.balance, actionTransaction);
-				console.log('Balance in recalc balance: ', balance);
+
         await Transaction.updateOne(
-            { _id: el.id },
-            { balance: balance },
-            function (err) {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log('Success update')
-                }
-            }
+          { _id: el.id },
+          { balance: balance },
         )
     })
 }
@@ -145,7 +138,7 @@ const recalculateUpdateBalance = async (
 			};
 		};
 		balance = transaction.balance;
-		console.log('Balance in recalc balance: ', balance);
+
 		return transaction;
 	});
 
@@ -153,14 +146,7 @@ const recalculateUpdateBalance = async (
 		if (el.balance !== updatedTransactions[i].balance) {
 			await Transaction.updateOne(
 				{ _id: el.id },
-				{ balance: updatedTransactions[i].balance },
-				function (err) {
-					if (err) {
-						console.log(err)
-					} else {
-						console.log('Success update')
-					}
-				}
+				{ balance: updatedTransactions[i].balance }
 			)
 		}
 	})
@@ -182,15 +168,8 @@ const recalculateDellBalance = async (
     await transactions.forEach(async (el) => {
         balance = calcDellBalance(balance, el)
         await Transaction.updateOne(
-            { _id: el.id },
-            { balance: balance },
-            function (err) {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log('Success update')
-                }
-            }
+          { _id: el.id },
+          { balance: balance }
         )
     })
 }

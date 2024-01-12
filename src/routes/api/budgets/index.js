@@ -8,8 +8,8 @@ const {
 } = require("./validation");
 
 router.use((req, res, next) => {
-    console.log(req.url);
-    next();
+  console.log(req.url);
+  next();
 });
 
 router.post("/", guard, ctrl.getBudgets);

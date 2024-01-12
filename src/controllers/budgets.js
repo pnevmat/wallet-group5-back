@@ -106,7 +106,7 @@ const updateBudget = async (req, res, next) => {
 				const newBudget = {...req.body, budget: mapedBudgetItems};
 
 				const budget = await Budgets.updateBudget(userId, newBudget);
-				console.log('Updated budget: ', budget);
+
 				if (budget) {
 					const total = planBudget(budget.budget);
 					return res.status(HttpCode.OK).json({ 
@@ -131,8 +131,6 @@ const removeBudget = async (req, res, next) => {
     try {
       const userId = req.user.id;
 			const {budgetId} = req.params;
-			console.log('User id: ', userId);
-			console.log('Budget id: ', budgetId);
 			const budget = await Budgets.deleteBudget(userId, budgetId);
 
 			if (budget) {

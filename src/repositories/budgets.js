@@ -14,22 +14,20 @@ const getBudgetById = async (userId, budgetId) => {
 };
 
 const getPlanBudgetsByDate = async (userId, body) => {
-    const { month, year } = body;
-		console.log('Month: ', month);
-    const monthIntger = getMonthFromString(month);
-		console.log('Numeric month: ', monthIntger);
-    const startDate = updateStartDate(monthIntger, year);
-		console.log('Start date: ', startDate);
-    const endDate = updateEndDate(monthIntger, year).toISOString();
-    const result = await Budget.find({
-        date: { $gte: startDate, $lt: endDate },
-        owner: userId,
-    }).populate({
-        path: "owner",
-        select: "name",
-    });
+  const { month, year } = body;
+  const monthIntger = getMonthFromString(month);
+  const startDate = updateStartDate(monthIntger, year);
+  const endDate = updateEndDate(monthIntger, year).toISOString();
 
-    return result;
+  const result = await Budget.find({
+    date: { $gte: startDate, $lt: endDate },
+    owner: userId,
+  }).populate({
+    path: "owner",
+    select: "name",
+  });
+
+  return result;
 };
 
 
