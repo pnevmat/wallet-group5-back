@@ -7,21 +7,23 @@ const budgetSchema = new Schema(
             type: Date,
             required: true,
         },
-        amount: {
-            type: Number,
-        },
         owner: {
             type: SchemaTypes.ObjectId,
             ref: "user"
         },
-        category: {
-            type: String,
-            trim: true,
-            stringType: "lowercase",
-        },
-        budget: {
-            type: Number,
-        },
+        budget: [{
+					planAmount: {
+						type: Number,
+					},
+					factAmount: {
+						type: Number,
+					},
+					category: {
+						type: String,
+						trim: true,
+						stringType: "lowercase",
+					},
+				}],
     },
     {
         versionKey: false,

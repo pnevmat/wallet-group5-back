@@ -4,8 +4,10 @@ const { HttpCode } = require("../../../helpers/constants");
 
 const schemaCreateBudget = Joi.object({
     date: Joi.date().required(),
-    amount: Joi.number().required(),
-    category: Joi.string().pattern(new RegExp("^[а-яА-ЯёЁa-zA-Z0-9 ]+$")).optional(),
+		budget: Joi.array().items(Joi.object({
+			planAmount: Joi.number().required(),
+			category: Joi.string().pattern(new RegExp("^[а-яА-ЯёЁa-zA-Z0-9 ]+$")).optional(),
+		}))
 });
 
 const validate = async (schema, obj, next) => {

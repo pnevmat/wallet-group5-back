@@ -12,13 +12,10 @@ router.use((req, res, next) => {
     next();
 });
 
-router
-    .get("/", guard, ctrl.getBudgets);
-router
-    .post("/add", guard, validationCreateBudget, ctrl.addBudget);
-router
-    .put("/:budgetId", guard, ctrl.updateBudget)
-    .delete("/:budgetId", guard, ctrl.removeBudget);
+router.post("/", guard, ctrl.getBudgets);
+router.post("/add", guard, validationCreateBudget, ctrl.addBudget);
+router.put("/:budgetId", guard, ctrl.updateBudget);
+router.delete("/:budgetId", guard, ctrl.removeBudget);
 
 
 module.exports = router;

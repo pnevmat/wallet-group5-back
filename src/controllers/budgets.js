@@ -1,42 +1,82 @@
 const Budgets = require("../repositories/budgets");
+const {getTransactionsByDate} = require('../repositories/transactions');
 const Users = require("../repositories/users");
 const { HttpCode } = require("../helpers/constants");
-const { planBudget } = require("..//helpers/operationsBudget");
+const { planBudget, calcTotal } = require("..//helpers/operationsBudget");
 const { v4: uuidv4 } = require("uuid");
 
 const getBudgets = async (req, res, next) => {
     try {
-        const userId = req.user.id;
-        const budgets = await Budgets.getPlanBudgetsByDate(
-            userId,
-            req.body
-        );
-        console.log(budgets)
-        // budgets.sort(function (a, b) {
-        //     return new Date(b.date).getTime() - new Date(a.date).getTime();
-        // })
-        if (budgets.length !== 0) {
-            const budget = planBudget(budgets);
-            return res.json({
-                status: "success",
-                code: HttpCode.OK,
-                data: { budgets, budget },
-            });
-        }
+      const userId = req.user.id;
+      const budgets = await Budgets.getPlanBudgetsByDate(userId, req.body);
+
+			if (budgets.length === 0) {
+				return res.json({
+          status: "success",
+          code: HttpCode.OK,
+          data: { budget: {}, total: 0 },
+        });
+			};
+
+			const transactions = await getTransactionsByDate(userId, req.body);
+
+			const costTransactions = transactions.filter(t => t.type === 'cost');
+			const mapedBudgetItems = budgets[0].budget.map(item => ({
+				...item._doc,
+				factAmount: calcTotal(costTransactions.filter(t => t.category === item.category))
+			}));
+
+			const newBudget = {id: budgets[0].id, date: budgets[0].date, budget: mapedBudgetItems};
+			const budget = await Budgets.updateBudget(userId, newBudget);
+
+      if (budget) {
+        const total = planBudget(budget.budget);
+        return res.json({
+          status: "success",
+          code: HttpCode.OK,
+          data: { budget, total },
+        });
+      } else {
+				return res.status(HttpCode.INTERNAL_SERVER_ERROR).json({
+					status: "error",
+					code: HttpCode.INTERNAL_SERVER_ERROR,
+					message: "db connection error",
+				});
+			}
     } catch (error) {
-        next(error);
+      next(error);
     }
 };
-
+// Переписать этот контроллер чтобы он сохранял в бд объект такого типа: {date: 2024-01-10, budget: [{id: 'dffkj', category: 'fdvfg', planAmount: 1500, factAmmount: 500}]}
 const addBudget = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const budget = await Budgets.addBudget(userId, req.body);
+				const date = new Date(req.body.date);
+				const monthAndYear = {
+					month: date.getMonth() + 1,
+					year: date.getFullYear()
+				};
+
+				const transactions = await getTransactionsByDate(userId, monthAndYear);
+
+				const costTransactions = transactions.filter(t => t.type === 'cost');
+				const mapedBudgetItems = req.body.budget.map(item => ({
+					...item,
+					factAmount: calcTotal(costTransactions.filter(t => t.category === item.category))
+				}));
+				const newBudget = {...req.body, budget: mapedBudgetItems};
+
+        const budget = await Budgets.addBudget(userId, newBudget);
+
         if (budget) {
-            return res
-                .status(HttpCode.CREATED)
-                .json({ status: "success", code: HttpCode.CREATED, budget });
-        }
+					const total = planBudget(budget.budget);
+            return res.status(HttpCode.CREATED).json({ 
+							status: "success", 
+							code: HttpCode.CREATED, 
+							data: {budget, total} 
+						});
+        };
+
         return res.status(HttpCode.BAD_REQUEST).json({
             status: "error",
             code: HttpCode.BAD_REQUEST,
@@ -50,6 +90,38 @@ const addBudget = async (req, res, next) => {
 const updateBudget = async (req, res, next) => {
     try {
         const userId = req.user.id;
+				const date = new Date(req.body.date);
+				const monthAndYear = {
+					month: date.getMonth() + 1,
+					year: date.getFullYear()
+				};
+
+				const transactions = await getTransactionsByDate(userId, monthAndYear);
+
+				const costTransactions = transactions.filter(t => t.type === 'cost');
+				const mapedBudgetItems = req.body.budget.map(item => ({
+					...item,
+					factAmount: calcTotal(costTransactions.filter(t => t.category === item.category))
+				}));
+				const newBudget = {...req.body, budget: mapedBudgetItems};
+
+				const budget = await Budgets.updateBudget(userId, newBudget);
+				console.log('Updated budget: ', budget);
+				if (budget) {
+					const total = planBudget(budget.budget);
+					return res.status(HttpCode.OK).json({ 
+						status: "success", 
+						code: HttpCode.OK, 
+						data: {budget, total} 
+					});
+				};
+
+				return res.status(HttpCode.NOT_FOUND).json({
+					status: "error",
+					code: HttpCode.NOT_FOUND,
+					message: "budget not found",
+				});
+				
     } catch (error) {
         next(error);
     }
@@ -57,9 +129,28 @@ const updateBudget = async (req, res, next) => {
 
 const removeBudget = async (req, res, next) => {
     try {
-        const userId = req.user.id;
+      const userId = req.user.id;
+			const {budgetId} = req.params;
+			console.log('User id: ', userId);
+			console.log('Budget id: ', budgetId);
+			const budget = await Budgets.deleteBudget(userId, budgetId);
+
+			if (budget) {
+				return res.status(HttpCode.OK).json({ 
+					status: "success", 
+					code: HttpCode.OK, 
+					budget 
+				});
+			}
+
+			return res.status(HttpCode.NOT_FOUND).json({
+				status: "error",
+				code: HttpCode.NOT_FOUND,
+				message: "budget not found",
+			});
+			
     } catch (error) {
-        next(error);
+      next(error);
     }
 }
 
