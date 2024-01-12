@@ -1,6 +1,5 @@
 const Budget = require("../model/budget");
 const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
-const { planBudget } = require("..//helpers/operationsBudget");
 
 const getBudgetById = async (userId, budgetId) => {
     const result = await Budget.findOne({

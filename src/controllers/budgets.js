@@ -1,9 +1,7 @@
 const Budgets = require("../repositories/budgets");
 const {getTransactionsByDate} = require('../repositories/transactions');
-const Users = require("../repositories/users");
-const { HttpCode } = require("../helpers/constants");
 const { planBudget, calcTotal } = require("..//helpers/operationsBudget");
-const { v4: uuidv4 } = require("uuid");
+const { HttpCode } = require("../helpers/constants");
 
 const getBudgets = async (req, res, next) => {
     try {

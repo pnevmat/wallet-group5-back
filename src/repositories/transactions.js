@@ -1,8 +1,7 @@
-const { query } = require("express");
 const Transaction = require("../model/transaction");
 const UpdateDataUser = require("../helpers/updateDataUser");
 const { updateStartDate, updateEndDate, getMonthFromString } = require("../helpers/updateDate");
-const { getLastTransactionsBalance, getLastPrevTransactionBalace, calcNewBalance, getCurrentBalance, recalculateDellBalance, recalculateBalance, recalculateUpdateBalance, calcDellBalance } = require("../helpers/operationsTracsactions");
+const { getLastPrevTransactionBalace, calcNewBalance, recalculateBalance, recalculateUpdateBalance } = require("../helpers/operationsTracsactions");
 
 const getTransactions = async (userId, query) => {
     const {

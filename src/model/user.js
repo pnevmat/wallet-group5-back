@@ -2,7 +2,6 @@ const { Schema, model } = require("mongoose");
 const { isEmail } = require("validator");
 const bcrypt = require("bcryptjs");
 const gravatar = require("gravatar");
-const { categories } = require("../helpers/constants");
 
 const SALT_WORK_FACTOR = 8;
 
