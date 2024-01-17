@@ -13,7 +13,7 @@ const register = async (req, res, next) => {
       return res.status(HttpCode.CONFLICT).json({
         status: "error",
         code: HttpCode.CONFLICT,
-        message: "Provided email already exists",
+        message: "Такой email уже зарегистрирован",
       });
     }
 
@@ -41,7 +41,7 @@ const login = async (req, res, next) => {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: "error",
         code: HttpCode.UNAUTHORIZED,
-        message: "Email or password is wrong",
+        message: "Не верный логин или пароль",
       });
     }
     const id = user.id;

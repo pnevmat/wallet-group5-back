@@ -55,6 +55,18 @@ const addBudget = async (req, res, next) => {
 					year: date.getFullYear()
 				};
 
+				const budgets = await Budgets.getPlanBudgetsByDate(
+					userId, monthAndYear
+				);
+
+				if (budgets.length > 0) {
+					return res.status(HttpCode.CONFLICT).json({
+          	status: "error",
+          	code: HttpCode.CONFLICT,
+          	message: "Бюджет на данный период уже создан",
+        	});
+				};
+
 				const transactions = await getTransactionsByDate(userId, monthAndYear);
 
 				const costTransactions = transactions.filter(t => t.type === 'cost');
@@ -68,11 +80,11 @@ const addBudget = async (req, res, next) => {
 
         if (budget) {
 					const total = planBudget(budget.budget);
-            return res.status(HttpCode.CREATED).json({ 
-							status: "success", 
-							code: HttpCode.CREATED, 
-							data: {budget, total} 
-						});
+          return res.status(HttpCode.CREATED).json({ 
+						status: "success", 
+						code: HttpCode.CREATED, 
+						data: {budget, total} 
+					});
         };
 
         return res.status(HttpCode.BAD_REQUEST).json({
